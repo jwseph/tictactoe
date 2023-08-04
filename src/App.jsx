@@ -148,10 +148,33 @@ function SelectModePage() {
   )
 }
 
+const WIN_STATES = [
+  0b100100100,
+  0b010010010,
+  0b001001001,
+  0b111000000,
+  0b000111000,
+  0b000000111,
+  0b100010001,
+  0b001010100,
+]
+
 function LocalPlayPage() {
   const [wins, setWins] = useState([0, 0]);
-  const [gameState, setGameState] = useState(0b000011111000010101);  // 0b_markedTiles_tileTypes
-  const player = useRef(0);
+  const [gameState, setGameState] = useState(0);  // 0b_markedTiles_tileTypes
+  const [player, setPlayer] = useState(0);
+  function checkWin(state) {
+    for (const winState of WIN_STATES) {
+      if ((state>>9&winState) != winState) continue;
+      let taken = state&0b111111111&winState;
+      if (taken == 0) {
+        console.log('O won')
+      }
+      if (taken == winState) {
+        console.log('X won')
+      }
+    }
+  }
   return (
     <>
       <div className='flex'>
@@ -163,8 +186,14 @@ function LocalPlayPage() {
       <div className='w-full px-8'>
         <Board
           gameState={gameState}
-          player={0}
-          onClick={(i) => console.log(i, 'Clicked!')}
+          player={player}
+          onClick={(i) => {
+            console.log(i, 'Clicked!');
+            let newGameState = gameState | player<<i | 1<<i+9;
+            setGameState(newGameState);
+            checkWin(newGameState);
+            setPlayer(1-player);
+          }}
         />
       </div>
       <div className='flex flex-row-reverse'>
