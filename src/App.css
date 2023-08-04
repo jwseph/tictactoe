@@ -1,0 +1,46 @@
+#root {
+  margin: 0 auto;
+}
+* {
+  outline: none;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+html, body, #root {
+  height: 100%;
+}
+iframe, #videoContainer > * {
+  width: 100%;
+  height: 100%;
+}
+img, a {
+  -webkit-user-drag: none;
+  -khtml-user-drag: none;
+  -moz-user-drag: none;
+  -o-user-drag: none;
+  user-drag: none;
+}
+
+.fade-in {
+  animation: fadein 1s ease;
+  animation-fill-mode: both;
+}
+.delay-1 { animation-delay: .1s; }
+.delay-2 { animation-delay: .2s; }
+.delay-3 { animation-delay: .3s; }
+.delay-4 { animation-delay: .4s; }
+.delay-5 { animation-delay: .5s; }
+.delay-6 { animation-delay: .6s; }
+.delay-7 { animation-delay: .7s; }
+.delay-8 { animation-delay: .8s; }
+.delay-9 { animation-delay: .9s; }
+@keyframes fadein {
+  0% {
+    opacity: 0;
+    scale: 1.1;
+  }
+  100% {
+    opacity: 1;
+    scale: 1;
+  }
+}
