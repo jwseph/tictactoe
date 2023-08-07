@@ -44,3 +44,27 @@ img, a {
     scale: 1;
   }
 }
+
+.place {
+  animation: placemark .3s ease;
+  animation-fill-mode: both;
+}
+@keyframes placemark {
+  0% {
+    opacity: 0;
+    scale: 1.4;
+  }
+  100% {
+    opacity: 1;
+    scale: 1;
+  }
+}
+
+.become-transparent {
+  animation: become-transparent .3s ease-in-out;
+  animation-fill-mode: both;
+}
+@keyframes become-transparent {
+  0% { color: rgb(228 228 231); }
+  100% { color: rgb(63 63 70); }
+}
