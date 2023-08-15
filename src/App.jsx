@@ -35,15 +35,34 @@ function X() {
   )
 }
 
+function getWinState(state) {
+  for (const winState of WIN_STATES) {
+    if ((state>>9&winState) != winState) continue;
+    let taken = state&0b111111111&winState;
+    if (taken == 0 || taken == winState) return winState;
+  }
+  return 0;
+}
+
+function getWinner(state) {
+  for (const winState of WIN_STATES) {
+    if ((state>>9&winState) != winState) continue;
+    let taken = state&0b111111111&winState;
+    if (taken == 0) return 0;
+    if (taken == winState) return 1;
+  }
+  return -1;
+}
+
 function solve(state) {
   // Returns -1 (X win), 0 (tie), or 1 (O win), assuming O goes first
-  if ((state>>9&(1<<9)-1) == (1<<9)-1) return 0;
   for (const winState of WIN_STATES) {
     if ((state>>9&winState) != winState) continue;
     let taken = state&0b111111111&winState;
     if (taken == 0) return 1;
     if (taken == winState) return -1;
   }
+  if ((state>>9&(1<<9)-1) == (1<<9)-1) return 0;
   let res = -Infinity;
   for (let i = 0; i < 9; ++i) {
     if (state&1<<9+i) continue;
@@ -54,7 +73,6 @@ function solve(state) {
 }
 
 function getOptimalMove(state) {
-  if ((state>>9&(1<<9)-1) == (1<<9)-1) return 0;
   let res = -Infinity, idx = [];
   for (let i = 0; i < 9; ++i) {
     if (state&1<<9+i) continue;
@@ -223,28 +241,22 @@ function LocalPlayPage() {
     setPlayer(startingPlayer);
     setStartingPlayer(1-startingPlayer);
   }
-  function getWinState(state) {
-    for (const winState of WIN_STATES) {
-      if ((state>>9&winState) != winState) continue;
-      let taken = state&0b111111111&winState;
-      if (taken == 0 || taken == winState) return winState;
+  function makeMove(i) {
+    let newGameState = gameState | player<<i | 1<<i+9;
+    setGameState(newGameState);
+    setPlayer(1-player);
+    let newWinState = getWinState(newGameState);
+    if (!newWinState && (newGameState&(1<<9)-1<<9) == ((1<<9)-1<<9)) {
+      newWinState = 1<<18;
     }
-    return 0;
-  }
-  function getWinner(state) {
-    for (const winState of WIN_STATES) {
-      if ((state>>9&winState) != winState) continue;
-      let taken = state&0b111111111&winState;
-      if (taken == 0) {
-        setWinningState(winState);
-        return 0;
-      }
-      if (taken == winState) {
-        setWinningState(winState);
-        return 1;
-      }
+    setWinningState(newWinState);
+    let winner = getWinner(newGameState);
+    if (winner >= 0) {
+      let newWins = [...wins];
+      newWins[winner]++;
+      setWins(newWins);
     }
-    return -1;
+    if (!newWinState) setPlayer(1-player);
   }
   return (
     <>
@@ -261,31 +273,8 @@ function LocalPlayPage() {
             gameState={gameState}
             winningState={winningState}
             player={player}
-            onClick={(i) => {
-              setPlayer(1-player);
-              console.log(i, 'Clicked!');
-              let newGameState = gameState | player<<i | 1<<i+9;
-              setGameState(newGameState);
-              console.log('solve', solve(newGameState^(newGameState>>9)*(1-player)))
-              console.log('optimalMove', getOptimalMove(newGameState^(newGameState>>9)*(1-player)));
-              let newWinState = getWinState(newGameState);
-              console.log(newGameState, newWinState);
-              if (!newWinState && (newGameState&(1<<9)-1<<9) == ((1<<9)-1<<9)) {
-                console.log('Draw');
-                newWinState = 1<<18;
-              }
-              console.log(newWinState);
-              setWinningState(newWinState);
-              if (newWinState) setPlayer(player);
-              let winner = getWinner(newGameState);
-              if (winner < 0) return;
-              let newWins = [...wins];
-              newWins[winner]++;
-              setWins(newWins);
-            }}
-            onFinishedClick={() => {
-              resetGameData();
-            }}
+            onClick={makeMove}
+            onFinishedClick={resetGameData}
           />
         </div>
         {/* <div className='relative w-full aspect-square mt-[-100%] bg-zinc-700/50'>
@@ -305,16 +294,94 @@ function LocalPlayPage() {
   )
 }
 
+function ComputerPlayPage() {
+  const [wins, setWins] = useState([0, 0]);
+  const [gameState, setGameState] = useState();  // 0b_markedTiles_tileTypes
+  const [startingPlayer, setStartingPlayer] = useState(1);
+  const [player, setPlayer] = useState();
+  const [winningState, setWinningState] = useState();
+  useEffect(() => resetGameData(), [])
+  useEffect(() => {
+    if (player != 0) return;
+    const timeout = setTimeout(() => {
+      const moves = getOptimalMove(gameState^(gameState>>9)*player);
+      if (!moves.length) return;
+      let i = moves[0|moves.length*Math.random()];
+      makeMove(i);
+    }, 500)
+    return () => clearTimeout(timeout)
+  }, [player, gameState]);
+  function resetGameData() {
+    setGameState(0);
+    setWinningState(0);
+    setPlayer(startingPlayer);
+    setStartingPlayer(1-startingPlayer);
+  }
+  function makeMove(i) {
+    let newGameState = gameState | player<<i | 1<<i+9;
+    setGameState(newGameState);
+    setPlayer(1-player);
+    let newWinState = getWinState(newGameState);
+    if (!newWinState && (newGameState&(1<<9)-1<<9) == ((1<<9)-1<<9)) {
+      newWinState = 1<<18;
+    }
+    setWinningState(newWinState);
+    let winner = getWinner(newGameState);
+    if (winner >= 0) {
+      let newWins = [...wins];
+      newWins[winner]++;
+      setWins(newWins);
+    }
+    if (!newWinState) setPlayer(1-player);
+  }
+  return (
+    <>
+      <div className={classNames('flex duration-300 ease-in-out', player != 0 && 'text-zinc-700')}>
+        <div className='fade-in delay-4 w-full px-8 flex gap-4 items-center'>
+          <div className='w-5 h-5'><O/></div>
+          <div className='font-medium text-lg flex-1'>Computer</div>
+          <div className='text-lg font-medium'>{wins[0]}</div>
+        </div>
+      </div>
+      <div className='px-8'>
+        <div className={classNames('w-full duration-1000 ease-in-out')}>
+          <Board
+            gameState={gameState}
+            winningState={winningState}
+            player={player}
+            disabled={player != 1}
+            onClick={makeMove}
+            onFinishedClick={resetGameData}
+          />
+        </div>
+        {/* <div className='relative w-full aspect-square mt-[-100%] bg-zinc-700/50'>
+          <svg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'>
+            <circle cx='50' cy='50' r='48' fill='none' stroke='white' strokeWidth='4'/>
+          </svg>
+        </div> */}
+      </div>
+      <div className={classNames('flex duration-300 ease-in-out', player != 1 && 'text-zinc-700')}>
+        <div className='fade-in delay-4 w-full px-8 flex gap-4 items-center'>
+          <div className='w-5 h-5'><X/></div>
+          <div className='font-medium text-lg flex-1'>You</div>
+          <div className='text-lg font-medium'>{wins[1]}</div>
+        </div>
+      </div>
+    </>
+  )
+}
+
 function App() {
   return (
     <div className='bg-black w-full min-h-full px-0 sm:px-8 py-1 sm:py-8 flex flex-col justify-center items-center bg-gradient-to-br selection:bg-violet-300/25 selection:text-zinc-50 select-none'>
-      <div className='bg-black text-zinc-200 w-full sm:px-8 py-12 max-w-md sm:rounded-xl space-y-12'>
+      <div className='bg-black text-zinc-200 w-full sm:px-8 py-28 max-w-md sm:rounded-xl space-y-12'>
         <Routes>
           <Route path='/' element={<SelectModePage/>}/>
           <Route path='/local' element={<LocalPlayPage/>}/>
+          <Route path='/computer' element={<ComputerPlayPage/>}/>
         </Routes>
       </div>
-      <div className='w-full p-6 flex justify-center bottom-0 absolute sm:bottom-auto sm:top-0 sm:justify-start bg-black/50 backdrop-blur-sm'>
+      <div className='w-full p-6 flex justify-center bottom-0 fixed sm:bottom-auto sm:top-0 sm:justify-start bg-black/50 backdrop-blur-sm'>
         <Link to='/' className='fade-in delay-4 p-2 rounded-md text-zinc-700 hover:text-zinc-200 duration-300 ease-in-out'>
           <div className='w-8 aspect-square flex flex-col'>
             <div className='flex-1 w-full flex'>
