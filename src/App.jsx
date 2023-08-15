@@ -7,6 +7,17 @@ const classNames = (...classes) => classes.filter(Boolean).join(' ');
 
 const PLAYERS = 'OX';
 
+const WIN_STATES = [
+  0b100100100,
+  0b010010010,
+  0b001001001,
+  0b111000000,
+  0b000111000,
+  0b000000111,
+  0b100010001,
+  0b001010100,
+]
+
 function O() {
   return (
     <svg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'>
@@ -22,6 +33,41 @@ function X() {
       <line x1='92' y1='8' x2='8' y2='92' stroke='currentColor' strokeWidth='8'/>
     </svg>
   )
+}
+
+function solve(state) {
+  // Returns -1 (X win), 0 (tie), or 1 (O win), assuming O goes first
+  if ((state>>9&(1<<9)-1) == (1<<9)-1) return 0;
+  for (const winState of WIN_STATES) {
+    if ((state>>9&winState) != winState) continue;
+    let taken = state&0b111111111&winState;
+    if (taken == 0) return 1;
+    if (taken == winState) return -1;
+  }
+  let res = -Infinity;
+  for (let i = 0; i < 9; ++i) {
+    if (state&1<<9+i) continue;
+    let newState = state|1<<9+i;
+    res = Math.max(res, -solve(newState^newState>>9));
+  }
+  return res;
+}
+
+function getOptimalMove(state) {
+  if ((state>>9&(1<<9)-1) == (1<<9)-1) return 0;
+  let res = -Infinity, idx = [];
+  for (let i = 0; i < 9; ++i) {
+    if (state&1<<9+i) continue;
+    let newState = state|1<<9+i;
+    let s = -solve(newState^newState>>9);
+    if (s < res) continue;
+    if (s > res) {
+      res = s;
+      idx = [];
+    }
+    idx.push(i)
+  }
+  return idx;
 }
 
 function Mark({type, hidden, transparent}) {
@@ -50,10 +96,12 @@ function Mark({type, hidden, transparent}) {
   );
 }
 
-function Board({gameState, winningState, player, onClick, disabled}) {
+function Board({gameState, winningState, player, onClick, onFinishedClick, disabled}) {
   return (
     <div className='fade-in'>
-      <div className='w-full aspect-square flex flex-col'>
+      <div className='w-full aspect-square flex flex-col' onClick={() => {
+        if (winningState) onFinishedClick();
+      }}>
         <div className='flex-1 w-full flex'>
           <div className='flex-1 h-full'>
             {gameState>>9&1
@@ -162,23 +210,19 @@ function SelectModePage() {
   )
 }
 
-const WIN_STATES = [
-  0b100100100,
-  0b010010010,
-  0b001001001,
-  0b111000000,
-  0b000111000,
-  0b000000111,
-  0b100010001,
-  0b001010100,
-]
-
 function LocalPlayPage() {
   const [wins, setWins] = useState([0, 0]);
-  const [gameState, setGameState] = useState(0);  // 0b_markedTiles_tileTypes
-  const [player, setPlayer] = useState(0);
-  const [winningState, setWinningState] = useState(0);
-  const [gameOver, setGameOver] = useState(false);
+  const [gameState, setGameState] = useState();  // 0b_markedTiles_tileTypes
+  const [startingPlayer, setStartingPlayer] = useState(1);
+  const [player, setPlayer] = useState();
+  const [winningState, setWinningState] = useState();
+  useEffect(() => resetGameData(), [])
+  function resetGameData() {
+    setGameState(0);
+    setWinningState(0);
+    setPlayer(startingPlayer);
+    setStartingPlayer(1-startingPlayer);
+  }
   function getWinState(state) {
     for (const winState of WIN_STATES) {
       if ((state>>9&winState) != winState) continue;
@@ -205,13 +249,14 @@ function LocalPlayPage() {
   return (
     <>
       <div className={classNames('flex duration-300 ease-in-out', player != 0 && 'text-zinc-700')}>
-        <div className='fade-in delay-4 px-8 flex gap-2 items-center'>
+        <div className='fade-in delay-4 w-full px-8 flex gap-4 items-center'>
           <div className='w-5 h-5'><O/></div>
+          <div className='font-medium text-lg flex-1'>Person B</div>
           <div className='text-lg font-medium'>{wins[0]}</div>
         </div>
       </div>
       <div className='px-8'>
-        <div className={classNames('w-full duration-1000 ease-in-out', gameOver && 'opacity-50')}>
+        <div className={classNames('w-full duration-1000 ease-in-out')}>
           <Board
             gameState={gameState}
             winningState={winningState}
@@ -221,6 +266,8 @@ function LocalPlayPage() {
               console.log(i, 'Clicked!');
               let newGameState = gameState | player<<i | 1<<i+9;
               setGameState(newGameState);
+              console.log('solve', solve(newGameState^(newGameState>>9)*(1-player)))
+              console.log('optimalMove', getOptimalMove(newGameState^(newGameState>>9)*(1-player)));
               let newWinState = getWinState(newGameState);
               console.log(newGameState, newWinState);
               if (!newWinState && (newGameState&(1<<9)-1<<9) == ((1<<9)-1<<9)) {
@@ -230,14 +277,14 @@ function LocalPlayPage() {
               console.log(newWinState);
               setWinningState(newWinState);
               if (newWinState) setPlayer(player);
-              return;
               let winner = getWinner(newGameState);
               if (winner < 0) return;
               let newWins = [...wins];
               newWins[winner]++;
               setWins(newWins);
-              setGameOver(true);
-              // setGameState(0);
+            }}
+            onFinishedClick={() => {
+              resetGameData();
             }}
           />
         </div>
@@ -247,9 +294,10 @@ function LocalPlayPage() {
           </svg>
         </div> */}
       </div>
-      <div className={classNames('flex flex-row-reverse duration-300 ease-in-out', player != 1 && 'text-zinc-700')}>
-        <div className='fade-in delay-4 px-8 flex flex-row-reverse gap-2 items-center'>
+      <div className={classNames('flex duration-300 ease-in-out', player != 1 && 'text-zinc-700')}>
+        <div className='fade-in delay-4 w-full px-8 flex gap-4 items-center'>
           <div className='w-5 h-5'><X/></div>
+          <div className='font-medium text-lg flex-1'>Person A</div>
           <div className='text-lg font-medium'>{wins[1]}</div>
         </div>
       </div>
