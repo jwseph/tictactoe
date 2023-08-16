@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import './App.css'
 import { GoGlobe, GoPeople, GoSmiley }from 'react-icons/go'
 import { Route, Link, Routes, useNavigate, useParams } from 'react-router-dom'
+import { socket } from './socket'
 
 const classNames = (...classes) => classes.filter(Boolean).join(' ');
 
@@ -38,7 +39,7 @@ function X() {
 function getWinState(state) {
   for (const winState of WIN_STATES) {
     if ((state>>9&winState) != winState) continue;
-    let taken = state&0b111111111&winState;
+    let taken = state&winState;
     if (taken == 0 || taken == winState) return winState;
   }
   return 0;
@@ -47,7 +48,7 @@ function getWinState(state) {
 function getWinner(state) {
   for (const winState of WIN_STATES) {
     if ((state>>9&winState) != winState) continue;
-    let taken = state&0b111111111&winState;
+    let taken = state&winState;
     if (taken == 0) return 0;
     if (taken == winState) return 1;
   }
@@ -58,7 +59,7 @@ function solve(state) {
   // Returns -1 (X win), 0 (tie), or 1 (O win), assuming O goes first
   for (const winState of WIN_STATES) {
     if ((state>>9&winState) != winState) continue;
-    let taken = state&0b111111111&winState;
+    let taken = state&winState;
     if (taken == 0) return 1;
     if (taken == winState) return -1;
   }
@@ -116,7 +117,7 @@ function Mark({type, hidden, transparent}) {
 
 function Board({gameState, winningState, player, onClick, onFinishedClick, disabled}) {
   return (
-    <div className='fade-in'>
+    <div className={classNames('fade-in', winningState && 'cursor-pointer')}>
       <div className='w-full aspect-square flex flex-col' onClick={() => {
         if (winningState) onFinishedClick();
       }}>
@@ -296,7 +297,7 @@ function LocalPlayPage() {
 
 function ComputerPlayPage() {
   const [wins, setWins] = useState([0, 0]);
-  const [gameState, setGameState] = useState();  // 0b_markedTiles_tileTypes
+  const [gameState, setGameState] = useState();
   const [startingPlayer, setStartingPlayer] = useState(1);
   const [player, setPlayer] = useState();
   const [winningState, setWinningState] = useState();
@@ -371,12 +372,139 @@ function ComputerPlayPage() {
   )
 }
 
+function OnlinePlayPage() {
+  const [wins, setWins] = useState([0, 0]);
+  const [gameState, setGameState] = useState();
+  const [startingPlayer, setStartingPlayer] = useState(1);
+  const [player, setPlayer] = useState(1);
+  const [winningState, setWinningState] = useState();
+  const [you, setYou] = useState();
+  const [name, setName] = useState('');
+  const [nameConfirmed, setNameConfirmed] = useState(false);
+  const [names, setNames] = useState(['', ''])
+  console.log('player='+player)
+  useEffect(() => {
+    socket.on('start_game', (data) => {
+      console.log('START GAME');
+      console.log(data);
+      resetGameData()
+      setYou(data.you);
+      setNames(data.names);
+      setNameConfirmed(true);
+    })
+    return () => {
+      socket.removeAllListeners();
+    }
+  }, [])
+  useEffect(() => {
+    socket.on('make_move', makeMove);
+    return () => {
+      socket.off('make_move', makeMove);
+    }
+  }, [player, gameState])
+  useEffect(() => {
+    socket.on('reset_board', resetGameData);
+    return () => socket.off('reset_board', resetGameData);
+  }, [startingPlayer])
+  useEffect(() => () => {
+    if (nameConfirmed) {
+      socket.emit('clear_name');
+    }
+  }, [nameConfirmed])
+  function resetGameData() {
+    setGameState(0);
+    setWinningState(0);
+    setPlayer(startingPlayer);
+    setStartingPlayer(1-startingPlayer);
+  }
+  function makeMove(i) {
+    let newGameState = gameState | player<<i | 1<<i+9;
+    setGameState(newGameState);
+    setPlayer(1-player);
+    let newWinState = getWinState(newGameState);
+    if (!newWinState && (newGameState&(1<<9)-1<<9) == ((1<<9)-1<<9)) {
+      newWinState = 1<<18;
+    }
+    setWinningState(newWinState);
+    let winner = getWinner(newGameState);
+    if (winner >= 0) {
+      let newWins = [...wins];
+      newWins[winner]++;
+      setWins(newWins);
+    }
+    if (!newWinState) setPlayer(1-player);
+  }
+  return you == undefined ? (
+    <div className='fade-in flex flex-col px-8 gap-4'>
+      <form onSubmit={(e) => {
+        e.preventDefault();
+        if (!name) return;
+        socket.emit('set_name', name, () => {
+          setName(name);
+          setNameConfirmed(true);
+        });
+      }}>
+        <input autoFocus disabled={nameConfirmed} value={name} onChange={e => setName(e.target.value.trim())} id='name' name='name' autoComplete='off' className='relative block w-full rounded-md border-0 px-4 py-3 bg-[black] text-zinc-200 disabled:text-zinc-500 ring-1 ring-inset ring-zinc-800 placeholder:text-zinc-600 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-zinc-400 text-lg duration-300 ease-in-out' placeholder='Your name'/>
+      </form>
+      <h1 className={classNames(
+        'text-center text-zinc-400',
+        nameConfirmed && 'animate-pulse',
+      )}>
+        {nameConfirmed ? 'Waiting for an opponent to join...' : 'Enter your name to continue'}
+      </h1>
+    </div>
+  ) : (
+    <>
+      <div className={classNames('flex duration-300 ease-in-out', player == you && 'text-zinc-700')}>
+        <div className='fade-in delay-4 w-full px-8 flex gap-4 items-center'>
+          <div className='w-5 h-5'>{you != 0 ? <O/> : <X/>}</div>
+          <div className='font-medium text-lg flex-1 flex items-center'>{names[1-you]}</div>
+          <div className='text-lg font-medium'>{wins[1-you]}</div>
+        </div>
+      </div>
+      <div className='px-8'>
+        <div className={classNames('w-full duration-1000 ease-in-out')}>
+          <Board
+            gameState={gameState}
+            winningState={winningState}
+            player={player}
+            disabled={player != you}
+            onClick={(i) => {
+              makeMove(i);
+              socket.emit('make_move', i);
+            }}
+            onFinishedClick={() => {
+              socket.emit('rematch');
+            }}
+          />
+        </div>
+      </div>
+      <div className={classNames('flex duration-300 ease-in-out', player != you && 'text-zinc-700')}>
+        <div className='fade-in delay-4 w-full px-8 flex gap-4 items-center'>
+          <div className='w-5 h-5'>{you == 0 ? <O/> : <X/>}</div>
+          <div className='font-medium text-lg flex-1 flex items-baseline gap-2'>
+            {names[you]}
+            <span className={classNames(
+              'duration-300 ease-in-out font-medium text-sm',
+              player == you ? 'text-zinc-500' : 'text-zinc-800'
+            )}>
+              (You)
+            </span>
+          </div>
+          <div className='text-lg font-medium'>{wins[you]}</div>
+        </div>
+      </div>
+    </>
+  )
+}
+
 function App() {
   return (
-    <div className='bg-black w-full min-h-full px-0 sm:px-8 py-1 sm:py-8 flex flex-col justify-center items-center bg-gradient-to-br selection:bg-violet-300/25 selection:text-zinc-50 select-none'>
-      <div className='bg-black text-zinc-200 w-full sm:px-8 py-28 max-w-md sm:rounded-xl space-y-12'>
+    <div className='bg-black w-full min-h-full px-0 sm:px-8 py-1 sm:py-8 flex flex-col justify-center items-center bg-gradient-to-br selection:bg-zinc-700 selection:text-zinc-50 select-none'>
+      <div className='bg-black text-zinc-200 w-full px-4 sm:px-8 py-28 max-w-md sm:rounded-xl space-y-12'>
         <Routes>
           <Route path='/' element={<SelectModePage/>}/>
+          <Route path='/online' element={<OnlinePlayPage/>}/>
           <Route path='/local' element={<LocalPlayPage/>}/>
           <Route path='/computer' element={<ComputerPlayPage/>}/>
         </Routes>
