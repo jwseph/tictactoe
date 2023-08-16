@@ -21,10 +21,6 @@ img, a {
   user-drag: none;
 }
 
-.fade-in {
-  animation: fadein 1s ease;
-  animation-fill-mode: both;
-}
 .delay-1 { animation-delay: .1s; }
 .delay-2 { animation-delay: .2s; }
 .delay-3 { animation-delay: .3s; }
@@ -34,6 +30,11 @@ img, a {
 .delay-7 { animation-delay: .7s; }
 .delay-8 { animation-delay: .8s; }
 .delay-9 { animation-delay: .9s; }
+
+.fade-in {
+  animation: fadein 1s ease;
+  animation-fill-mode: both;
+}
 @keyframes fadein {
   0% {
     opacity: 0;
@@ -42,6 +43,34 @@ img, a {
   100% {
     opacity: 1;
     scale: 1;
+  }
+}
+
+.fade-in-out {
+  animation: fadeinout 3s ease-in-out;
+  animation-fill-mode: both;
+}
+@keyframes fadeinout {
+  0% {
+    opacity: 0;
+    scale: .9;
+    color: rgb(63 63 70);
+  }
+  33% {
+    opacity: 1;
+    scale: 1;
+    color: rgb(228 228 231);
+  }
+  66% {
+    opacity: 1;
+    scale: 1;
+    color: rgb(228 228 231);
+  }
+  100% {
+    opacity: 0;
+    scale: .9;
+    color: rgb(63 63 70);
+    rotate: 180deg;
   }
 }
 

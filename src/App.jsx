@@ -398,9 +398,7 @@ function OnlinePlayPage() {
   }, [])
   useEffect(() => {
     socket.on('make_move', makeMove);
-    return () => {
-      socket.off('make_move', makeMove);
-    }
+    return () => socket.off('make_move', makeMove);
   }, [player, gameState])
   useEffect(() => {
     socket.on('reset_board', resetGameData);
@@ -499,45 +497,78 @@ function OnlinePlayPage() {
 }
 
 function App() {
+  const [intro, setIntro] = useState(true);
+  useEffect(() => {
+    const timeout = setTimeout(() => setIntro(false), 3000);
+    return () => clearTimeout(timeout)
+  }, [])
   return (
     <div className='bg-black w-full min-h-full px-0 sm:px-8 py-1 sm:py-8 flex flex-col justify-center items-center bg-gradient-to-br selection:bg-zinc-700 selection:text-zinc-50 select-none'>
-      <div className='bg-black text-zinc-200 w-full px-4 sm:px-8 py-28 max-w-md sm:rounded-xl space-y-12'>
-        <Routes>
-          <Route path='/' element={<SelectModePage/>}/>
-          <Route path='/online' element={<OnlinePlayPage/>}/>
-          <Route path='/local' element={<LocalPlayPage/>}/>
-          <Route path='/computer' element={<ComputerPlayPage/>}/>
-        </Routes>
-      </div>
-      <div className='w-full p-6 flex justify-center bottom-0 fixed sm:bottom-auto sm:top-0 sm:justify-start bg-black/50 backdrop-blur-sm'>
-        <Link to='/' className='fade-in delay-4 p-2 rounded-md text-zinc-700 hover:text-zinc-200 duration-300 ease-in-out'>
-          <div className='w-8 aspect-square flex flex-col'>
-            <div className='flex-1 w-full flex'>
-              <div className='flex-1 h-full'></div>
-              <div className='w-[2px] bg-current'></div>
-              <div className='flex-1 h-full'></div>
-              <div className='w-[2px] bg-current'></div>
-              <div className='flex-1 h-full'></div>
+      {!intro ? <>
+        <div className='bg-black text-zinc-200 w-full px-4 sm:px-8 py-28 max-w-md sm:rounded-xl space-y-12'>
+          <Routes>
+            <Route path='/' element={<SelectModePage/>}/>
+            <Route path='/online' element={<OnlinePlayPage/>}/>
+            <Route path='/local' element={<LocalPlayPage/>}/>
+            <Route path='/computer' element={<ComputerPlayPage/>}/>
+          </Routes>
+        </div>
+        <div className='w-full p-6 flex justify-center bottom-0 fixed sm:bottom-auto sm:top-0 sm:justify-start bg-black/50 backdrop-blur-sm'>
+          <Link to='/' className='p-2 rounded-md text-zinc-700 hover:text-zinc-200 duration-300 ease-in-out'>
+            <div className='fade-in w-8 aspect-square flex flex-col'>
+              <div className='flex-1 w-full flex'>
+                <div className='flex-1 h-full'></div>
+                <div className='w-[2px] bg-current'></div>
+                <div className='flex-1 h-full'></div>
+                <div className='w-[2px] bg-current'></div>
+                <div className='flex-1 h-full'></div>
+              </div>
+              <div className='h-[2px] bg-current'></div>
+              <div className='flex-1 w-full flex'>
+                <div className='flex-1 h-full'></div>
+                <div className='w-[2px] bg-current'></div>
+                <div className='flex-1 h-full'></div>
+                <div className='w-[2px] bg-current'></div>
+                <div className='flex-1 h-full'></div>
+              </div>
+              <div className='h-[2px] bg-current'></div>
+              <div className='flex-1 w-full flex'>
+                <div className='flex-1 h-full'></div>
+                <div className='w-[2px] bg-current'></div>
+                <div className='flex-1 h-full'></div>
+                <div className='w-[2px] bg-current'></div>
+                <div className='flex-1 h-full'></div>
+              </div>
             </div>
-            <div className='h-[2px] bg-current'></div>
-            <div className='flex-1 w-full flex'>
-              <div className='flex-1 h-full'></div>
-              <div className='w-[2px] bg-current'></div>
-              <div className='flex-1 h-full'></div>
-              <div className='w-[2px] bg-current'></div>
-              <div className='flex-1 h-full'></div>
-            </div>
-            <div className='h-[2px] bg-current'></div>
-            <div className='flex-1 w-full flex'>
-              <div className='flex-1 h-full'></div>
-              <div className='w-[2px] bg-current'></div>
-              <div className='flex-1 h-full'></div>
-              <div className='w-[2px] bg-current'></div>
-              <div className='flex-1 h-full'></div>
-            </div>
+          </Link>
+        </div>
+      </> :
+        <div className='fade-in-out w-16 aspect-square flex flex-col'>
+          <div className='flex-1 w-full flex'>
+            <div className='flex-1 h-full'></div>
+            <div className='w-[3px] bg-current'></div>
+            <div className='flex-1 h-full'></div>
+            <div className='w-[3px] bg-current'></div>
+            <div className='flex-1 h-full'></div>
           </div>
-        </Link>
-      </div>
+          <div className='h-[3px] bg-current'></div>
+          <div className='flex-1 w-full flex'>
+            <div className='flex-1 h-full'></div>
+            <div className='w-[3px] bg-current'></div>
+            <div className='flex-1 h-full'></div>
+            <div className='w-[3px] bg-current'></div>
+            <div className='flex-1 h-full'></div>
+          </div>
+          <div className='h-[3px] bg-current'></div>
+          <div className='flex-1 w-full flex'>
+            <div className='flex-1 h-full'></div>
+            <div className='w-[3px] bg-current'></div>
+            <div className='flex-1 h-full'></div>
+            <div className='w-[3px] bg-current'></div>
+            <div className='flex-1 h-full'></div>
+          </div>
+        </div>
+      }
     </div>
   )
 }
