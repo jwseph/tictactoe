@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import './App.css'
-import { GoGlobe, GoPeople, GoSmiley }from 'react-icons/go'
+import { GoGlobe, GoPeople, GoSmiley, GoSun, GoMoon }from 'react-icons/go'
 import { Route, Link, Routes } from 'react-router-dom'
 import { socket } from './socket'
 
@@ -97,14 +97,14 @@ function Mark({type, hidden, transparent}) {
   return type == 0 ? (
     <div className={classNames(
       'w-full h-full text-center p-5',
-      transparent ? 'become-transparent' : hidden ? 'text-black hover:text-zinc-900 cursor-pointer' : 'place opacity-100',
+      transparent ? 'become-transparent' : hidden ? 'text-black hover:text-neutral-900 cursor-pointer' : 'place opacity-100',
     )}>
       <O/>
     </div>
   ) : type == 1 ? (
     <div className={classNames(
       'w-full h-full flex justify-center items-center p-5',
-      transparent ? 'become-transparent' : hidden ? 'text-black hover:text-zinc-900 cursor-pointer' : 'place opacity-100',
+      transparent ? 'become-transparent' : hidden ? 'text-black hover:text-neutral-900 cursor-pointer' : 'place opacity-100',
     )}>
       <X/>
     </div>
@@ -126,14 +126,14 @@ function Board({gameState, winningState, player, onClick, onFinishedClick, disab
               : !disabled && !winningState && <div className='w-full h-full cursor-pointer' onClick={() => onClick(0)}><Mark type={player} hidden/></div>
             }
           </div>
-          <div className='w-[5px] bg-zinc-700'></div>
+          <div className='w-[5px] bg-neutral-700'></div>
           <div className='flex-1 h-full'>
             {gameState>>9+1&1
               ? <Mark type={gameState>>1&1} transparent={winningState && !(winningState>>1&1)}/>
               : !disabled && !winningState  && <div className='w-full h-full cursor-pointer' onClick={() => onClick(1)}><Mark type={player} hidden/></div>
             }
           </div>
-          <div className='w-[5px] bg-zinc-700'></div>
+          <div className='w-[5px] bg-neutral-700'></div>
           <div className='flex-1 h-full'>
             {gameState>>9+2&1
               ? <Mark type={gameState>>2&1} transparent={winningState && !(winningState>>2&1)}/>
@@ -141,7 +141,7 @@ function Board({gameState, winningState, player, onClick, onFinishedClick, disab
             }
           </div>
         </div>
-        <div className='h-[5px] bg-zinc-700'></div>
+        <div className='h-[5px] bg-neutral-700'></div>
         <div className='flex-1 w-full flex'>
           <div className='flex-1 h-full'>
             {gameState>>9+3&1
@@ -149,14 +149,14 @@ function Board({gameState, winningState, player, onClick, onFinishedClick, disab
               : !disabled && !winningState  && <div className='w-full h-full cursor-pointer' onClick={() => onClick(3)}><Mark type={player} hidden/></div>
             }
           </div>
-          <div className='w-[5px] bg-zinc-700'></div>
+          <div className='w-[5px] bg-neutral-700'></div>
           <div className='flex-1 h-full'>
             {gameState>>9+4&1
               ? <Mark type={gameState>>4&1} transparent={winningState && !(winningState>>4&1)}/>
               : !disabled && !winningState  && <div className='w-full h-full cursor-pointer' onClick={() => onClick(4)}><Mark type={player} hidden/></div>
             }
           </div>
-          <div className='w-[5px] bg-zinc-700'></div>
+          <div className='w-[5px] bg-neutral-700'></div>
           <div className='flex-1 h-full'>
             {gameState>>9+5&1
               ? <Mark type={gameState>>5&1} transparent={winningState && !(winningState>>5&1)}/>
@@ -164,7 +164,7 @@ function Board({gameState, winningState, player, onClick, onFinishedClick, disab
             }
           </div>
         </div>
-        <div className='h-[5px] bg-zinc-700'></div>
+        <div className='h-[5px] bg-neutral-700'></div>
         <div className='flex-1 w-full flex'>
           <div className='flex-1 h-full'>
             {gameState>>9+6&1
@@ -172,14 +172,14 @@ function Board({gameState, winningState, player, onClick, onFinishedClick, disab
               : !disabled && !winningState  && <div className='w-full h-full cursor-pointer' onClick={() => onClick(6)}><Mark type={player} hidden/></div>
             }
           </div>
-          <div className='w-[5px] bg-zinc-700'></div>
+          <div className='w-[5px] bg-neutral-700'></div>
           <div className='flex-1 h-full'>
             {gameState>>9+7&1
               ? <Mark type={gameState>>7&1} transparent={winningState && !(winningState>>7&1)}/>
               : !disabled && !winningState  && <div className='w-full h-full cursor-pointer' onClick={() => onClick(7)}><Mark type={player} hidden/></div>
             }
           </div>
-          <div className='w-[5px] bg-zinc-700'></div>
+          <div className='w-[5px] bg-neutral-700'></div>
           <div className='flex-1 h-full'>
             {gameState>>9+8&1
               ? <Mark type={gameState>>8&1} transparent={winningState && !(winningState>>8&1)}/>
@@ -196,25 +196,25 @@ function SelectModePage() {
   return (
     <>
       <div className='fade-in flex flex-col gap-2'>
-        <Link to='/online' className='group w-full px-5 py-4 sm:rounded-lg flex items-center hover:bg-zinc-900/75 duration-300 ease-in-out gap-5'>
-          <GoGlobe className='w-10 h-10 text-zinc-700 group-hover:text-zinc-500 duration-300 ease-in-out'/>
+        <Link to='/online' className='group w-full px-5 py-4 sm:rounded-lg flex items-center hover:bg-neutral-900/75 duration-300 ease-in-out gap-5'>
+          <GoGlobe className='w-10 h-10 text-neutral-700 group-hover:text-neutral-500 duration-300 ease-in-out'/>
           <div className='flex-1 font-medium'>
-            <h3 className='text-left text-zinc-500 group-hover:text-zinc-200 text-lg duration-300 ease-in-out'>Online</h3>
-            <p className='text-left text-zinc-700 group-hover:text-zinc-500 text-sm duration-300 ease-in-out'>Play against an online opponent</p>
+            <h3 className='text-left text-neutral-500 group-hover:text-neutral-200 text-lg duration-300 ease-in-out'>Online</h3>
+            <p className='text-left text-neutral-700 group-hover:text-neutral-500 text-sm duration-300 ease-in-out'>Play against an online opponent</p>
           </div>
         </Link>
-        <Link to='/local' className='group w-full px-5 py-4 sm:rounded-lg flex items-center hover:bg-zinc-900/75 duration-300 ease-in-out gap-5'>
-          <GoPeople className='w-10 h-10 text-zinc-700 group-hover:text-zinc-500 duration-300 ease-in-out'/>
+        <Link to='/local' className='group w-full px-5 py-4 sm:rounded-lg flex items-center hover:bg-neutral-900/75 duration-300 ease-in-out gap-5'>
+          <GoPeople className='w-10 h-10 text-neutral-700 group-hover:text-neutral-500 duration-300 ease-in-out'/>
           <div className='flex-1 font-medium'>
-            <h3 className='text-left text-zinc-500 group-hover:text-zinc-200 text-lg duration-300 ease-in-out'>Local</h3>
-            <p className='text-left text-zinc-700 group-hover:text-zinc-500 text-sm duration-300 ease-in-out'>Play against a friend on this device</p>
+            <h3 className='text-left text-neutral-500 group-hover:text-neutral-200 text-lg duration-300 ease-in-out'>Local</h3>
+            <p className='text-left text-neutral-700 group-hover:text-neutral-500 text-sm duration-300 ease-in-out'>Play against a friend on this device</p>
           </div>
         </Link>
-        <Link to='/computer' className='group w-full px-5 py-4 sm:rounded-lg flex items-center hover:bg-zinc-900/75 duration-300 ease-in-out gap-5'>
-          <GoSmiley className='w-10 h-10 text-zinc-700 group-hover:text-zinc-500 duration-300 ease-in-out'/>
+        <Link to='/computer' className='group w-full px-5 py-4 sm:rounded-lg flex items-center hover:bg-neutral-900/75 duration-300 ease-in-out gap-5'>
+          <GoSmiley className='w-10 h-10 text-neutral-700 group-hover:text-neutral-500 duration-300 ease-in-out'/>
           <div className='flex-1 font-medium'>
-            <h3 className='text-left text-zinc-500 group-hover:text-zinc-200 text-lg duration-300 ease-in-out'>Computer</h3>
-            <p className='text-left text-zinc-700 group-hover:text-zinc-500 text-sm duration-300 ease-in-out'>Play against the computer</p>
+            <h3 className='text-left text-neutral-500 group-hover:text-neutral-200 text-lg duration-300 ease-in-out'>Computer</h3>
+            <p className='text-left text-neutral-700 group-hover:text-neutral-500 text-sm duration-300 ease-in-out'>Play against the computer</p>
           </div>
         </Link>
       </div>
@@ -254,7 +254,7 @@ function LocalPlayPage() {
   }
   return (
     <>
-      <div className={classNames('flex duration-300 ease-in-out', player != 0 && 'text-zinc-700')}>
+      <div className={classNames('flex duration-300 ease-in-out', player != 0 && 'text-neutral-700')}>
         <div className='fade-in delay-4 w-full px-8 flex gap-4 items-center text-xl font-medium'>
           <div className='w-6 h-6'><O/></div>
           <div className='flex-1'></div>
@@ -272,7 +272,7 @@ function LocalPlayPage() {
           />
         </div>
       </div>
-      <div className={classNames('flex duration-300 ease-in-out', player != 1 && 'text-zinc-700')}>
+      <div className={classNames('flex duration-300 ease-in-out', player != 1 && 'text-neutral-700')}>
         <div className='fade-in delay-4 w-full px-8 flex gap-4 items-center text-xl font-medium'>
           <div className='w-6 h-6'><X/></div>
           <div className='flex-1'></div>
@@ -325,7 +325,7 @@ function ComputerPlayPage() {
   }
   return (
     <>
-      <div className={classNames('flex duration-300 ease-in-out', player != 0 && 'text-zinc-700')}>
+      <div className={classNames('flex duration-300 ease-in-out', player != 0 && 'text-neutral-700')}>
         <div className='fade-in delay-4 w-full px-8 flex gap-4 items-center text-xl font-medium'>
           <div className='w-6 h-6'><O/></div>
           <div className='flex-1'>Computer</div>
@@ -344,7 +344,7 @@ function ComputerPlayPage() {
           />
         </div>
       </div>
-      <div className={classNames('flex duration-300 ease-in-out', player != 1 && 'text-zinc-700')}>
+      <div className={classNames('flex duration-300 ease-in-out', player != 1 && 'text-neutral-700')}>
         <div className='fade-in delay-4 w-full px-8 flex gap-4 items-center text-xl font-medium'>
           <div className='w-6 h-6'><X/></div>
           <div className='flex-1'>You</div>
@@ -425,10 +425,10 @@ function OnlinePlayPage() {
           setNameConfirmed(true);
         });
       }}>
-        <input autoFocus disabled={nameConfirmed} value={name} onChange={e => setName(e.target.value.trim())} id='name' name='name' autoComplete='off' className='relative block w-full rounded-md border-0 px-4 py-3 bg-[black] text-zinc-200 disabled:text-zinc-500 ring-1 ring-inset ring-zinc-800 placeholder:text-zinc-600 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-zinc-400 text-lg duration-300 ease-in-out' placeholder='Your name'/>
+        <input autoFocus disabled={nameConfirmed} value={name} onChange={e => setName(e.target.value.trim())} id='name' name='name' autoComplete='off' className='relative block w-full rounded-md border-0 px-4 py-3 bg-[black] text-neutral-200 disabled:text-neutral-500 ring-1 ring-inset ring-neutral-800 placeholder:text-neutral-600 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-neutral-400 text-lg duration-300 ease-in-out' placeholder='Your name'/>
       </form>
       <h1 className={classNames(
-        'text-center text-zinc-400',
+        'text-center text-neutral-400',
         nameConfirmed && 'animate-pulse',
       )}>
         {nameConfirmed ? 'Waiting for an opponent to join...' : 'Enter your name to continue'}
@@ -436,7 +436,7 @@ function OnlinePlayPage() {
     </div>
   ) : (
     <>
-      <div className={classNames('flex duration-300 ease-in-out', player == you && 'text-zinc-700')}>
+      <div className={classNames('flex duration-300 ease-in-out', player == you && 'text-neutral-700')}>
         <div className='fade-in delay-4 w-full px-8 flex gap-4 items-center text-xl font-medium'>
           <div className='w-6 h-6'>{you != 0 ? <O/> : <X/>}</div>
           <div className='flex-1 flex items-center'>{names[1-you]}</div>
@@ -460,14 +460,14 @@ function OnlinePlayPage() {
           />
         </div>
       </div>
-      <div className={classNames('flex duration-300 ease-in-out', player != you && 'text-zinc-700')}>
+      <div className={classNames('flex duration-300 ease-in-out', player != you && 'text-neutral-700')}>
         <div className='fade-in delay-4 w-full px-8 flex gap-4 items-center text-xl font-medium'>
           <div className='w-6 h-6'>{you == 0 ? <O/> : <X/>}</div>
           <div className='flex-1 flex items-baseline gap-2'>
             {names[you]}
             <span className={classNames(
               'duration-300 ease-in-out font-medium text-sm',
-              player == you ? 'text-zinc-500' : 'text-zinc-800'
+              player == you ? 'text-neutral-500' : 'text-neutral-800'
             )}>
               (You)
             </span>
@@ -479,6 +479,29 @@ function OnlinePlayPage() {
   )
 }
 
+function LightModeButton() {
+  const [light, setLight] = useState(false);
+  return (
+    <div className='w-full p-6 flex justify-center sm:justify-end items-center top-0 fixed bg-black/80 border-b border-black sm:bg-transparent pointer-events-none'>
+      <div className='flex justify-center items-center'>
+        <button className='p-2 rounded-md text-neutral-700 hover:text-neutral-200 duration-300 ease-in-out pointer-events-auto'
+          onClick={() => setLight(!light)}
+        >
+          {light ? <GoSun className='w-8 h-8'/> : <GoMoon className='w-8 h-8'/>}
+        </button>
+        <div className='absolute w-[var(--light-mode-diameter)] h-[var(--light-mode-diameter)] rounded-full duration-500 ease-in-out'
+          style={{
+            '--light-mode-diameter': !light ? '0' : 2*Math.sqrt(window.innerWidth*window.innerWidth+window.innerHeight*window.innerHeight)+'px',
+            'background': 'white',
+            'z-index': '1000',
+            'mix-blend-mode': 'difference',
+          }}
+        />
+      </div>
+    </div>
+  )
+}
+
 function App() {
   const [intro, setIntro] = useState(true);
   useEffect(() => {
@@ -486,9 +509,10 @@ function App() {
     return () => clearTimeout(timeout)
   }, [])
   return (
-    <div className='bg-black w-full min-h-[100svh] px-0 sm:px-8 py-1 sm:py-8 flex flex-col justify-center items-center bg-gradient-to-br selection:bg-zinc-700 selection:text-zinc-50 select-none'>
+    <div className='bg-black w-full min-h-[100svh] px-0 sm:px-8 py-1 sm:py-8 flex flex-col justify-center items-center bg-gradient-to-br selection:bg-neutral-700 selection:text-neutral-50 select-none'>
+      {/* <div className='absolute top-0 left-0 right-0 bottom-0 bg-white z-10 pointer-events-none' style={{'mix-blend-mode': 'difference'}}></div> */}
       {!intro ? <>
-        <div className='bg-black text-zinc-200 w-full sm:px-8 py-28 max-w-md sm:rounded-xl space-y-12'>
+        <div className='bg-black text-neutral-200 w-full sm:px-8 py-28 max-w-md sm:rounded-xl space-y-12 pointer-events-auto'>
           <Routes>
             <Route path='/' element={<SelectModePage/>}/>
             <Route path='/online' element={<OnlinePlayPage/>}/>
@@ -496,8 +520,8 @@ function App() {
             <Route path='/computer' element={<ComputerPlayPage/>}/>
           </Routes>
         </div>
-        <div className='w-full p-6 flex justify-center bottom-0 fixed sm:bottom-auto sm:top-0 sm:justify-start bg-black/50 backdrop-blur-sm'>
-          <Link to='/' className='p-2 rounded-md text-zinc-700 hover:text-zinc-200 duration-300 ease-in-out'>
+        <div className='w-full p-6 flex justify-center bottom-0 fixed sm:bottom-auto sm:top-0 sm:justify-start bg-black/80 border-t sm:border-t-0 sm:border-b border-black'>
+          <Link to='/' className='p-2 rounded-md text-neutral-700 hover:text-neutral-200 duration-300 ease-in-out'>
             <div className='fade-in w-8 aspect-square flex flex-col'>
               <div className='flex-1 w-full flex'>
                 <div className='flex-1 h-full'></div>
@@ -525,6 +549,7 @@ function App() {
             </div>
           </Link>
         </div>
+        <LightModeButton/>
       </> :
         <div className='fade-in-out w-16 aspect-square flex flex-col'>
           <div className='flex-1 w-full flex'>
