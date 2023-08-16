@@ -1,12 +1,10 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import './App.css'
 import { GoGlobe, GoPeople, GoSmiley }from 'react-icons/go'
-import { Route, Link, Routes, useNavigate, useParams } from 'react-router-dom'
+import { Route, Link, Routes } from 'react-router-dom'
 import { socket } from './socket'
 
 const classNames = (...classes) => classes.filter(Boolean).join(' ');
-
-const PLAYERS = 'OX';
 
 const WIN_STATES = [
   0b100100100,
@@ -197,7 +195,6 @@ function Board({gameState, winningState, player, onClick, onFinishedClick, disab
 function SelectModePage() {
   return (
     <>
-      {/* <h1 className='text-2xl font-semibold tracking-tighter'>Select gamemode</h1> */}
       <div className='fade-in flex flex-col gap-2'>
         <Link to='/online' className='group w-full px-5 py-4 sm:rounded-lg flex items-center hover:bg-zinc-900/75 duration-300 ease-in-out gap-5'>
           <GoGlobe className='w-10 h-10 text-zinc-700 group-hover:text-zinc-500 duration-300 ease-in-out'/>
@@ -221,10 +218,6 @@ function SelectModePage() {
           </div>
         </Link>
       </div>
-      {/* <div>Online GoGlobe</div>
-      <div>Local GoPeople</div>
-      <div>Computer GoSmiley</div> */}
-      {/* <TicTacToe/> */}
     </>
   )
 }
@@ -278,11 +271,6 @@ function LocalPlayPage() {
             onFinishedClick={resetGameData}
           />
         </div>
-        {/* <div className='relative w-full aspect-square mt-[-100%] bg-zinc-700/50'>
-          <svg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'>
-            <circle cx='50' cy='50' r='48' fill='none' stroke='white' strokeWidth='4'/>
-          </svg>
-        </div> */}
       </div>
       <div className={classNames('flex duration-300 ease-in-out', player != 1 && 'text-zinc-700')}>
         <div className='fade-in delay-4 w-full px-8 flex gap-4 items-center'>
@@ -355,11 +343,6 @@ function ComputerPlayPage() {
             onFinishedClick={resetGameData}
           />
         </div>
-        {/* <div className='relative w-full aspect-square mt-[-100%] bg-zinc-700/50'>
-          <svg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'>
-            <circle cx='50' cy='50' r='48' fill='none' stroke='white' strokeWidth='4'/>
-          </svg>
-        </div> */}
       </div>
       <div className={classNames('flex duration-300 ease-in-out', player != 1 && 'text-zinc-700')}>
         <div className='fade-in delay-4 w-full px-8 flex gap-4 items-center'>
