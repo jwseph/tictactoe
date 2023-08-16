@@ -486,7 +486,7 @@ function App() {
     return () => clearTimeout(timeout)
   }, [])
   return (
-    <div className='bg-black w-full min-h-full px-0 sm:px-8 py-1 sm:py-8 flex flex-col justify-center items-center bg-gradient-to-br selection:bg-zinc-700 selection:text-zinc-50 select-none'>
+    <div className='bg-black w-full min-h-[100svh] px-0 sm:px-8 py-1 sm:py-8 flex flex-col justify-center items-center bg-gradient-to-br selection:bg-zinc-700 selection:text-zinc-50 select-none'>
       {!intro ? <>
         <div className='bg-black text-zinc-200 w-full px-4 sm:px-8 py-28 max-w-md sm:rounded-xl space-y-12'>
           <Routes>
