@@ -255,10 +255,10 @@ function LocalPlayPage() {
   return (
     <>
       <div className={classNames('flex duration-300 ease-in-out', player != 0 && 'text-zinc-700')}>
-        <div className='fade-in delay-4 w-full px-8 flex gap-4 items-center'>
-          <div className='w-5 h-5'><O/></div>
-          <div className='font-medium text-lg flex-1'>Person B</div>
-          <div className='text-lg font-medium'>{wins[0]}</div>
+        <div className='fade-in delay-4 w-full px-8 flex gap-4 items-center text-xl font-medium'>
+          <div className='w-6 h-6'><O/></div>
+          <div className='flex-1'></div>
+          <div>{wins[0]}</div>
         </div>
       </div>
       <div className='px-8'>
@@ -273,10 +273,10 @@ function LocalPlayPage() {
         </div>
       </div>
       <div className={classNames('flex duration-300 ease-in-out', player != 1 && 'text-zinc-700')}>
-        <div className='fade-in delay-4 w-full px-8 flex gap-4 items-center'>
-          <div className='w-5 h-5'><X/></div>
-          <div className='font-medium text-lg flex-1'>Person A</div>
-          <div className='text-lg font-medium'>{wins[1]}</div>
+        <div className='fade-in delay-4 w-full px-8 flex gap-4 items-center text-xl font-medium'>
+          <div className='w-6 h-6'><X/></div>
+          <div className='flex-1'></div>
+          <div>{wins[1]}</div>
         </div>
       </div>
     </>
@@ -326,10 +326,10 @@ function ComputerPlayPage() {
   return (
     <>
       <div className={classNames('flex duration-300 ease-in-out', player != 0 && 'text-zinc-700')}>
-        <div className='fade-in delay-4 w-full px-8 flex gap-4 items-center'>
-          <div className='w-5 h-5'><O/></div>
-          <div className='font-medium text-lg flex-1'>Computer</div>
-          <div className='text-lg font-medium'>{wins[0]}</div>
+        <div className='fade-in delay-4 w-full px-8 flex gap-4 items-center text-xl font-medium'>
+          <div className='w-6 h-6'><O/></div>
+          <div className='flex-1'>Computer</div>
+          <div>{wins[0]}</div>
         </div>
       </div>
       <div className='px-8'>
@@ -345,10 +345,10 @@ function ComputerPlayPage() {
         </div>
       </div>
       <div className={classNames('flex duration-300 ease-in-out', player != 1 && 'text-zinc-700')}>
-        <div className='fade-in delay-4 w-full px-8 flex gap-4 items-center'>
-          <div className='w-5 h-5'><X/></div>
-          <div className='font-medium text-lg flex-1'>You</div>
-          <div className='text-lg font-medium'>{wins[1]}</div>
+        <div className='fade-in delay-4 w-full px-8 flex gap-4 items-center text-xl font-medium'>
+          <div className='w-6 h-6'><X/></div>
+          <div className='flex-1'>You</div>
+          <div>{wins[1]}</div>
         </div>
       </div>
     </>
@@ -437,10 +437,10 @@ function OnlinePlayPage() {
   ) : (
     <>
       <div className={classNames('flex duration-300 ease-in-out', player == you && 'text-zinc-700')}>
-        <div className='fade-in delay-4 w-full px-8 flex gap-4 items-center'>
-          <div className='w-5 h-5'>{you != 0 ? <O/> : <X/>}</div>
-          <div className='font-medium text-lg flex-1 flex items-center'>{names[1-you]}</div>
-          <div className='text-lg font-medium'>{wins[1-you]}</div>
+        <div className='fade-in delay-4 w-full px-8 flex gap-4 items-center text-xl font-medium'>
+          <div className='w-6 h-6'>{you != 0 ? <O/> : <X/>}</div>
+          <div className='flex-1 flex items-center'>{names[1-you]}</div>
+          <div>{wins[1-you]}</div>
         </div>
       </div>
       <div className='px-8'>
@@ -461,9 +461,9 @@ function OnlinePlayPage() {
         </div>
       </div>
       <div className={classNames('flex duration-300 ease-in-out', player != you && 'text-zinc-700')}>
-        <div className='fade-in delay-4 w-full px-8 flex gap-4 items-center'>
-          <div className='w-5 h-5'>{you == 0 ? <O/> : <X/>}</div>
-          <div className='font-medium text-lg flex-1 flex items-baseline gap-2'>
+        <div className='fade-in delay-4 w-full px-8 flex gap-4 items-center text-xl font-medium'>
+          <div className='w-6 h-6'>{you == 0 ? <O/> : <X/>}</div>
+          <div className='flex-1 flex items-baseline gap-2'>
             {names[you]}
             <span className={classNames(
               'duration-300 ease-in-out font-medium text-sm',
@@ -472,7 +472,7 @@ function OnlinePlayPage() {
               (You)
             </span>
           </div>
-          <div className='text-lg font-medium'>{wins[you]}</div>
+          <div>{wins[you]}</div>
         </div>
       </div>
     </>
@@ -488,7 +488,7 @@ function App() {
   return (
     <div className='bg-black w-full min-h-[100svh] px-0 sm:px-8 py-1 sm:py-8 flex flex-col justify-center items-center bg-gradient-to-br selection:bg-zinc-700 selection:text-zinc-50 select-none'>
       {!intro ? <>
-        <div className='bg-black text-zinc-200 w-full px-4 sm:px-8 py-28 max-w-md sm:rounded-xl space-y-12'>
+        <div className='bg-black text-zinc-200 w-full sm:px-8 py-28 max-w-md sm:rounded-xl space-y-12'>
           <Routes>
             <Route path='/' element={<SelectModePage/>}/>
             <Route path='/online' element={<OnlinePlayPage/>}/>
