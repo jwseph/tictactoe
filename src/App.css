@@ -47,10 +47,14 @@ img, a {
 }
 
 .fade-in-out {
-  animation: fadeinout 3s ease-in-out;
+  animation: fadeinoutlight 3s ease-in-out;
   animation-fill-mode: both;
 }
-@keyframes fadeinout {
+.fade-in-out:is(.dark *) {
+  animation: fadeinoutdark 3s ease-in-out;
+  animation-fill-mode: both;
+}
+@keyframes fadeinoutdark {
   0% {
     opacity: 0;
     scale: .9;
@@ -73,6 +77,29 @@ img, a {
     rotate: 180deg;
   }
 }
+@keyframes fadeinoutlight {
+  0% {
+    opacity: 0;
+    scale: .9;
+    color: #d4d4d8;
+  }
+  33% {
+    opacity: 1;
+    scale: 1;
+    color: #27272a;
+  }
+  66% {
+    opacity: 1;
+    scale: 1;
+    color: #27272a;
+  }
+  100% {
+    opacity: 0;
+    scale: .9;
+    color: #d4d4d8;
+    rotate: 180deg;
+  }
+}
 
 .place {
   animation: placemark .3s ease;
@@ -90,10 +117,18 @@ img, a {
 }
 
 .become-transparent {
-  animation: become-transparent .3s ease-in-out;
+  animation: become-transparent-light .3s ease-in-out;
   animation-fill-mode: both;
 }
-@keyframes become-transparent {
+.become-transparent:is(.dark *) {
+  animation: become-transparent-dark .3s ease-in-out;
+  animation-fill-mode: both;
+}
+@keyframes become-transparent-light {
+  0% { color: #27272a; }
+  100% { color: #d4d4d8; }
+}
+@keyframes become-transparent-dark {
   0% { color: rgb(228 228 231); }
   100% { color: rgb(63 63 70); }
 }
