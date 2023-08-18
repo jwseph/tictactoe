@@ -365,6 +365,8 @@ function OnlinePlayPage() {
   const [name, setName] = useState('');
   const [nameConfirmed, setNameConfirmed] = useState(false);
   const [names, setNames] = useState(['', ''])
+  const [connected, setConnected] = useState(socket.connected);
+  const [opponentConnected, setOpponentConnected] = useState(true);
   console.log('player='+player)
   useEffect(() => {
     socket.on('start_game', (data) => {
@@ -375,10 +377,19 @@ function OnlinePlayPage() {
       setNames(data.names);
       setNameConfirmed(true);
     })
+    socket.on('opponent_disconnected', () => setOpponentConnected(false));
     return () => {
       socket.removeAllListeners();
     }
   }, [])
+  useEffect(() => {
+    if (you == undefined) return;
+    function disconnect() {
+      setConnected(false);
+    }
+    socket.on('disconnect', disconnect);
+    return () => socket.off('disconnect', disconnect);
+  }, [you])
   useEffect(() => {
     socket.on('make_move', makeMove);
     return () => socket.off('make_move', makeMove);
@@ -439,7 +450,7 @@ function OnlinePlayPage() {
       <div className={classNames('flex duration-300 ease-in-out', player == you && 'text-neutral-700')}>
         <div className='fade-in delay-4 w-full px-8 flex gap-4 items-center text-xl font-medium'>
           <div className='w-6 h-6'>{you != 0 ? <O/> : <X/>}</div>
-          <div className='flex-1 flex items-center'>{names[1-you]}</div>
+          <div className={classNames('flex-1 flex items-center', !opponentConnected && 'line-through')}>{names[1-you]}</div>
           <div>{wins[1-you]}</div>
         </div>
       </div>
@@ -464,9 +475,11 @@ function OnlinePlayPage() {
         <div className='fade-in delay-4 w-full px-8 flex gap-4 items-center text-xl font-medium'>
           <div className='w-6 h-6'>{you == 0 ? <O/> : <X/>}</div>
           <div className='flex-1 flex items-baseline gap-2'>
-            {names[you]}
+            <span className={!connected && 'line-through'}>
+              {names[you]}
+            </span>
             <span className={classNames(
-              'duration-300 ease-in-out font-medium text-sm',
+              'duration-300 ease-in-out font-medium text-sm no-underline',
               player == you ? 'text-neutral-500' : 'text-neutral-800'
             )}>
               (You)
@@ -481,6 +494,10 @@ function OnlinePlayPage() {
 
 function LightModeButton() {
   const [light, setLight] = useState(false);
+  useEffect(() => {
+    let el = document.querySelector('#light-sheet');
+    el.style['--light-mode-diameter'] = !light ? '0' : 2*Math.sqrt(window.innerWidth*window.innerWidth+window.innerHeight*window.innerHeight)+'px';
+  }, [light])
   return (
     <div className='w-full p-6 flex justify-center sm:justify-end items-center top-0 fixed bg-black/80 border-b border-black sm:bg-transparent pointer-events-none'>
       <div className='flex justify-center items-center'>
@@ -489,14 +506,6 @@ function LightModeButton() {
         >
           {light ? <GoSun className='w-8 h-8'/> : <GoMoon className='w-8 h-8'/>}
         </button>
-        <div className='absolute w-[var(--light-mode-diameter)] h-[var(--light-mode-diameter)] rounded-full duration-500 ease-in-out'
-          style={{
-            '--light-mode-diameter': !light ? '0' : 2*Math.sqrt(window.innerWidth*window.innerWidth+window.innerHeight*window.innerHeight)+'px',
-            'background': 'white',
-            'z-index': '1000',
-            'mix-blend-mode': 'difference',
-          }}
-        />
       </div>
     </div>
   )
@@ -510,7 +519,14 @@ function App() {
   }, [])
   return (
     <div className='bg-black w-full min-h-[100svh] px-0 sm:px-8 py-1 sm:py-8 flex flex-col justify-center items-center bg-gradient-to-br selection:bg-neutral-700 selection:text-neutral-50 select-none'>
-      {/* <div className='absolute top-0 left-0 right-0 bottom-0 bg-white z-10 pointer-events-none' style={{'mix-blend-mode': 'difference'}}></div> */}
+      <div id='light-sheet' className='absolute w-[var(--light-mode-diameter)] h-[var(--light-mode-diameter)] rounded-full duration-500 ease-in-out'
+        style={{
+          '--light-mode-diameter': '0',
+          'background': 'white',
+          'z-index': '1000',
+          'mix-blend-mode': 'difference',
+        }}
+      />
       {!intro ? <>
         <div className='bg-black text-neutral-200 w-full sm:px-8 py-28 max-w-md sm:rounded-xl space-y-12 pointer-events-auto'>
           <Routes>
